@@ -1,0 +1,50 @@
+#1
+\project_{pizza} (
+    ((\select_{gender="female" and age>20} Person )
+    \join Eats))
+
+
+# 2
+Close:   got the pizza names not the women's names
+
+\project_{pizza}(
+(\select_{pizzeria='Straw Hat'} Serves)  
+\join
+(\project_{name}
+\select_{gender='female'} Person)
+\join Eats)
+
+retry ?
+got both the name and the pizza, not just the name
+(\project_{name} (
+\select_{gender='female'} Person)
+\join
+\project_{pizza}
+(\select_{pizzeria='Straw Hat'} Serves) 
+\join Eats)
+
+
+#3
+Got incorrect, but will need to revisit/post a message since, from the data  I have seen, Amy nor Fay have eaten at Little New York Pizza.
+this had syntax error
+\project_{pizzeria} (
+(\select_{name='Amy' or name='Fay'} Frequents )
+\join {price < 10} Serves)
+
+used this:
+\project_{pizzeria}
+(
+(\select_{name='Amy' or name='Fay'} Frequents )
+\join
+ (\select_{price <10} Serves)
+)
+
+#4 
+got an empty set
+
+\project_{pizzeria}
+(
+(\select_{name='Amy' and name='Fay'} Frequents )
+\join
+ (\select_{price <10} Serves)
+)

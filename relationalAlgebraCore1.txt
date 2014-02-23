@@ -1,0 +1,83 @@
+Relational Algebra Core 
+
+Question #1:
+Find all pizzas eaten by at least one female over the age of 20.
+
+\project_{pizza} (
+    ((\select_{gender="female" and age>20} Person )
+    \join Eats))                 
+
+Question #2:
+
+Find the names of all females who eat at least one pizza served by Straw
+Hat. (Note: The pizza need not be eaten at Straw Hat.)
+
+\project_{name}(
+  ((\select_{pizzeria="Straw Hat"} Serves) //all pizzas Straw Hat serves
+   \join
+   Eats //all people who eat the pizzas that Straw Hat serves
+   \join
+   (\select_{gender="female"} Person) //all females who eat straw hat pizzas
+   ))
+
+Question #3:
+Find all pizzerias that serve at least one pizza for less than $10 that 
+either Amy or Fay (or both) eat.
+
+\project_{pizzeria}(
+  ((\select_{price < 10.0} Serves) //all pizzas less than $10
+  \join
+  (\select_{(name = 'Amy') or (name = 'Fay')} Eats) //all pizzas Fay and-or Amy
+  eat
+  ))
+
+Question #4:
+Find all pizzerias that serve at least one pizza for less than $10 that both
+Amy and Fay eat.
+
+\project_{pizzeria}(
+  ((\select_{price < 10.0} Serves) //all pizzas less than $10
+  \join
+  (Eats //all people who eat pizzas less than $10
+  \diff
+  (\select_{(name != 'Amy') and (name != 'Fay')} Eats)) //all pizzas Fay and Amy do NOT eat
+  \join
+  Frequents //the pizzeria's that Amy and Fay frequent
+  ))
+
+Question #5: my incorrect solution -- column number matching issue?:
+Find the names of all people who eat at least one pizza served by Dominos but
+who do not frequent Dominos.
+\project_{name}(
+  ((\select_{pizzeria = 'Dominos'} Serves) //pizzas served by Dominos
+   \join
+   Eats // names of people who eat these types of Dominos pizzas
+  //cols = pizza, price, name
+  \join 
+  Frequents // cols now name only of people who eat Dominos pizza types
+  \diff 
+  (\select_{pizzeria = 'Dominos'} Frequents) //minus people names who frequent Dominos
+  ))  
+
+Pam's correct solution:
+\project_{name} ( //selects name column - the project rel.op. from:     
+    ( \project_{name} ( 
+      //selects name column again from: Person - people names who frequent at Dominos pizza
+        ((\project_{name} Person) //all names from Person table
+            \diff   // minus
+            // people names who frequest at Dominos - subracted from above
+            (\project_{name}  \select_{pizzeria='Dominos'} Frequents)
+            ))) //end of selecting name col from this difference
+    \intersect // overlaps with:
+    (\project_{name} //select col name from: 
+        (Eats  // Eats table cols (names and pizza type) joined with:
+        \join
+        (\project_{pizza} 
+           //select col pizza from Serves table for pizza types from Dominos 
+           ( \select_{pizzeria='Dominos'} Serves)   )))
+)
+
+
+
+
+   
